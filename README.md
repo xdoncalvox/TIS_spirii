@@ -38,3 +38,6 @@ user: admin
 password: admin
 
 Add timescaledb datasource to grafana
+Add tempo datasource to grafana
+
+events can be now search using charger id in grafana>explore
