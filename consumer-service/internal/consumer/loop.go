@@ -27,36 +27,6 @@ func (c *Consumer) Run(ctx context.Context) {
 		}
 
 		c.handleMessage(ctx, msg)
-
-		ctx, span := c.Tracer.Start(
-			context.Background(),
-			"kafka.consume",
-			trace.WithAttributes(
-				attribute.String("charger.id", string(msg.Key)),
-				attribute.String("kafka.topic", msg.Topic),
-				attribute.Int("kafka.partition", msg.Partition),
-				attribute.Int64("kafka.offset", msg.Offset),
-			),
-		)
-
-		var event model.TelemetryEvent
-		if err := json.Unmarshal(msg.Value, &event); err != nil {
-			span.RecordError(err)
-			span.End()
-			continue
-		}
-
-		// DEMO processing
-		log.Printf(
-			"consumed charger=%s eventTime=%s metrics=%v",
-			event.ChargerID,
-			event.EventTime,
-			event.Metrics,
-		)
-
-		c.ProcessEvent(ctx, event)
-
-		span.End()
 	}
 }
 
@@ -77,13 +47,4 @@ func (c *Consumer) handleMessage(ctx context.Context, msg kafka.Message) {
 	}
 
 	c.Process(ctx, event)
-}
-
-func (c *Consumer) ProcessEvent(ctx context.Context, event model.TelemetryEvent) {
-	log.Printf(
-		"consumed charger=%s eventTime=%s metrics=%v",
-		event.ChargerID,
-		event.EventTime,
-		event.Metrics,
-	)
 }

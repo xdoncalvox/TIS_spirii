@@ -4,7 +4,7 @@ import "time"
 
 type TelemetryEvent struct {
 	ChargerID  string                 `json:"chargerId"`
-	EventTime  time.Time              `json:"eventTime"`
+	EventTime  time.Time              `json:"timestamp"`
 	IngestTime time.Time              `json:"ingestTime"`
 	Metrics    map[string]interface{} `json:"metrics"`
 	TraceID    string                 `json:"traceId"`

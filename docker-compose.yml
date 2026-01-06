@@ -49,7 +49,21 @@ services:
       KAFKA_BROKERS: kafka:9092
       KAFKA_TOPIC: charger.telemetry.raw
       KAFKA_GROUP_ID: charger-consumers
+      DATABASE_URL: postgres://telemetry:telemetry@timescaledb:5432/telemetry
+
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    container_name: timescaledb
+    environment:
+      POSTGRES_USER: telemetry
+      POSTGRES_PASSWORD: telemetry # use proper secret management in any real scenario (production or development). Only plain text for simplicity of this challenge.
+      POSTGRES_DB: telemetry
+    ports:
+      - "5432:5432"
+    volumes:
+      - tsdb-data:/var/lib/postgresql/data
 
 
 volumes:
   kafka-data:
+  tsdb-data:

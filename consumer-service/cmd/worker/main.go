@@ -9,6 +9,8 @@ import (
 	"github.com/segmentio/kafka-go"
 
 	"telemetry/consumer-service/internal/consumer"
+	"telemetry/consumer-service/internal/model"
+	"telemetry/consumer-service/internal/repository"
 	"telemetry/consumer-service/internal/telemetry"
 )
 
@@ -16,6 +18,11 @@ func main() {
 	brokers := strings.Split(os.Getenv("KAFKA_BROKERS"), ",")
 	topic := os.Getenv("KAFKA_TOPIC")
 	groupID := os.Getenv("KAFKA_GROUP_ID")
+
+	repo, err := repository.New(os.Getenv("DATABASE_URL"))
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	if topic == "" || groupID == "" {
 		log.Fatal("Kafka configuration missing")
@@ -37,7 +44,11 @@ func main() {
 		Tracer: tracer,
 	}
 
-	c.Process = c.ProcessEvent
+	c.Process = func(ctx context.Context, event model.TelemetryEvent) {
+		if err := repo.InsertEvent(ctx, event); err != nil {
+			log.Printf("db insert failed: %v", err)
+		}
+	}
 
 	log.Println("consumer-service started")
 	c.Run(context.Background())
