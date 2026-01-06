@@ -10,11 +10,12 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
+	"go.opentelemetry.io/otel/trace"
 )
 
 var tracerProvider *sdktrace.TracerProvider
 
-func InitTracer(serviceName string, endpoint string) sdktrace.Tracer {
+func InitTracer(serviceName string, endpoint string) trace.Tracer {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 

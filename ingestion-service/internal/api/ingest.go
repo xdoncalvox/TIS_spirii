@@ -7,12 +7,12 @@ import (
 
 	"go.opentelemetry.io/otel/trace"
 
-	"telemetry/internal/model"
-	"telemetry/internal/queue"
+	"telemetry/ingestion-service/internal/model"
+	"telemetry/ingestion-service/internal/queue"
 )
 
 type IngestHandler struct {
-	Queue queue.EventQueue
+	Queue  queue.EventQueue
 	Tracer trace.Tracer
 }
 

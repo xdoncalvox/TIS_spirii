@@ -5,8 +5,9 @@ import (
 	"encoding/json"
 	"time"
 
+	"telemetry/ingestion-service/internal/model"
+
 	"github.com/segmentio/kafka-go"
-	"telemetry/internal/model"
 )
 
 type KafkaQueue struct {

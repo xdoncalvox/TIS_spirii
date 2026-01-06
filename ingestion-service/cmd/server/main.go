@@ -3,12 +3,11 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
-	"strings"
 
-	"telemetry/internal/api"
-	"telemetry/internal/queue"
-	"telemetry/internal/telemetry"
+	"telemetry/ingestion-service/internal/api"
+	"telemetry/ingestion-service/internal/config"
+	"telemetry/ingestion-service/internal/queue"
+	"telemetry/ingestion-service/internal/telemetry"
 )
 
 func main() {
@@ -16,7 +15,7 @@ func main() {
 
 	tracer := telemetry.InitTracer(cfg.ServiceName, cfg.OtelEndpoint)
 	defer telemetry.Shutdown()
-	
+
 	kafkaQueue := queue.NewKafkaQueue(cfg.KafkaBrokers, cfg.KafkaTopic)
 	defer kafkaQueue.Close()
 

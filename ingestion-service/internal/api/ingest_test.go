@@ -2,8 +2,15 @@ package api
 
 import (
 	"context"
-	"telemetry/internal/model"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"telemetry/ingestion-service/internal/model"
+	"testing"
+
+	"go.opentelemetry.io/otel/trace"
 )
+
 type FakeQueue struct {
 	Published []model.TelemetryEvent
 }
