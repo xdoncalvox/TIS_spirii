@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 
@@ -51,6 +52,7 @@ func (h *IngestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.Queue.Publish(ctx, payload.ChargerID, event); err != nil {
+		log.Printf("kafka publish failed: %v", err)
 		http.Error(w, "queue failure", http.StatusServiceUnavailable)
 		return
 	}

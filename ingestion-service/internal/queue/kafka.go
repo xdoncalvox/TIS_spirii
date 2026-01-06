@@ -3,6 +3,8 @@ package queue
 import (
 	"context"
 	"encoding/json"
+	"log"
+	"strconv"
 	"time"
 
 	"telemetry/ingestion-service/internal/model"
@@ -15,6 +17,8 @@ type KafkaQueue struct {
 }
 
 func NewKafkaQueue(brokers []string, topic string) *KafkaQueue {
+	ensureTopic(brokers, topic)
+
 	return &KafkaQueue{
 		writer: &kafka.Writer{
 			Addr:         kafka.TCP(brokers...),
@@ -39,6 +43,45 @@ func (k *KafkaQueue) Publish(ctx context.Context, key string, event model.Teleme
 	}
 
 	return k.writer.WriteMessages(ctx, msg)
+}
+
+func ensureTopic(brokers []string, topic string) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	conn, err := kafka.DialContext(ctx, "tcp", brokers[0])
+	if err != nil {
+		log.Fatalf("failed to dial kafka: %v", err)
+	}
+	defer conn.Close()
+
+	controller, err := conn.Controller()
+	if err != nil {
+		log.Fatalf("failed to get controller: %v", err)
+	}
+	controllerConn, err := kafka.DialContext(
+		ctx,
+		"tcp",
+		controller.Host+":"+strconv.Itoa(controller.Port),
+	)
+	if err != nil {
+		log.Fatalf("failed to dial controller: %v", err)
+	}
+	defer controllerConn.Close()
+
+	topicConfig := kafka.TopicConfig{
+		Topic:             topic,
+		NumPartitions:     3,
+		ReplicationFactor: 1,
+	}
+
+	err = controllerConn.CreateTopics(topicConfig)
+	if err != nil {
+		// Topic already exists is NOT an error
+		log.Printf("topic create result: %v", err)
+	} else {
+		log.Printf("topic %s created", topic)
+	}
 }
 
 func (k *KafkaQueue) Close() error {
