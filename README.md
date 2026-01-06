@@ -15,6 +15,7 @@ Charger → Ingestion API (OpenTelemetry) → Kafka → TimescaleDB → Grafana
 
 # ADR
 For this task only, we use TimescaleDB to reduce operational complexity. ClickHouse is the intended production store.
+Kafka will run with a single broker for this task, in a production setup more brokers (ideally 3 as minimum) would be required.
 
 ## Running locally
 docker-compose up
