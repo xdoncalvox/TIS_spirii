@@ -64,7 +64,20 @@ services:
       - tsdb-data:/var/lib/postgresql/data
       - ./timescaledb/init:/docker-entrypoint-initdb.d
 
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - timescaledb
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana-data:/var/lib/grafana
 
 volumes:
   kafka-data:
   tsdb-data:
+  grafana-data:

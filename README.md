@@ -31,3 +31,10 @@ See clickhouse/schema/raw_events.sql
 ```
 docker compose up --build
 ```
+Grafana runs in port 3000
+localhost:3000
+default credentials:
+user: admin
+password: admin
+
+Add timescaledb datasource to grafana
