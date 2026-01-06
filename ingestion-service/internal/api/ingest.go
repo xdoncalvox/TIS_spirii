@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 
 	"telemetry/ingestion-service/internal/model"
@@ -33,7 +34,12 @@ func (h *IngestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx, span := h.Tracer.Start(r.Context(), "ingest_event")
+	ctx, span := h.Tracer.Start(
+		r.Context(), "ingest_event",
+		trace.WithAttributes(
+			attribute.String("charger.id", payload.ChargerID), // Add chargerId as a span attribute in ingestion, helps with tracing later
+		),
+	)
 	defer span.End()
 
 	event := model.TelemetryEvent{
