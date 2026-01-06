@@ -62,6 +62,7 @@ services:
       - "5432:5432"
     volumes:
       - tsdb-data:/var/lib/postgresql/data
+      - ./timescaledb/init:/docker-entrypoint-initdb.d
 
 
 volumes:

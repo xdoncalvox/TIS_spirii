@@ -24,3 +24,10 @@ docker-compose up
 
 ## Event schema
 See clickhouse/schema/raw_events.sql
+
+## Steps to Execute this project
+
+### Using docker-compose
+```
+docker compose up --build
+```
