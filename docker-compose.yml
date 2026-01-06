@@ -37,6 +37,7 @@ services:
       HTTP_PORT: 8080
       KAFKA_BROKERS: kafka:9092
       KAFKA_TOPIC: charger.telemetry.raw
+      OTEL_EXPORTER_OTLP_ENDPOINT: otel-collector:4317
     restart: unless-stopped
   
   consumer-service:
@@ -50,6 +51,7 @@ services:
       KAFKA_TOPIC: charger.telemetry.raw
       KAFKA_GROUP_ID: charger-consumers
       DATABASE_URL: postgres://telemetry:telemetry@timescaledb:5432/telemetry
+      OTEL_EXPORTER_OTLP_ENDPOINT: otel-collector:4317
 
   timescaledb:
     image: timescale/timescaledb:latest-pg16
@@ -64,6 +66,26 @@ services:
       - tsdb-data:/var/lib/postgresql/data
       - ./timescaledb/init:/docker-entrypoint-initdb.d
 
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: otel-collector
+    command: ["--config=/etc/otel-collector.yaml"]
+    volumes:
+      - ./otel/otel-collector.yaml:/etc/otel-collector.yaml
+    depends_on:
+      - tempo
+
+  tempo:
+    image: grafana/tempo:latest
+    container_name: tempo
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes:
+      - ./otel/tempo.yaml:/etc/tempo.yaml
+      - tempo-data:/var/tempo
+    ports:
+      - "3200:3200"   # HTTP
+      - "4317:4317"   # OTLP gRPC
+
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -77,7 +99,10 @@ services:
     volumes:
       - grafana-data:/var/lib/grafana
 
+
+
 volumes:
   kafka-data:
   tsdb-data:
   grafana-data:
+  tempo-data:

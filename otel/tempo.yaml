@@ -1,0 +1,26 @@
+server:
+  http_listen_port: 3200
+
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+
+storage:
+  trace:
+    backend: local # using local storage for simplicity of this challenge
+    local:
+      path: /var/tempo
+    wal:
+      path: /var/tempo/wal
+
+metrics_generator:
+  processor:
+    span_metrics:
+
+query_frontend:
+  max_outstanding_per_tenant: 200
